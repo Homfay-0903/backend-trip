@@ -23,6 +23,7 @@ exports.register = (req, res) => {
 
         reg_info.password = bcrypt.hashSync(reg_info.password, 10)
 
+        //更新users表
         const sql1 = 'insert into users set ?'
         db.query(sql1, {
             account: reg_info.account,

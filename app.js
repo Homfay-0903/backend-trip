@@ -12,6 +12,9 @@ app.use(bodyParser.urlencoded())
 app.use(bodyParser.json())
 
 
+const LoginRouter = require('./router/login')
+app.use('/api', LoginRouter)
+
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`app listening on port ${port}`)
 })
