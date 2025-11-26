@@ -2,6 +2,16 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+app.use((req, res, next) => {
+    res.cc = (err, status = 1) => {
+        res.send({
+            status,
+            message: err instanceof Error ? err.message : err,
+        })
+    }
+    next()
+})
+
 const cors = require('cors')
 app.use(cors())
 
@@ -10,6 +20,8 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded())
 // parse application/json
 app.use(bodyParser.json())
+
+
 
 
 const LoginRouter = require('./router/login')

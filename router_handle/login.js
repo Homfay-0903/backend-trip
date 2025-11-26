@@ -42,3 +42,24 @@ exports.register = (req, res) => {
         })
     })
 }
+
+exports.login = (req, res) => {
+    const login_info = req.body
+    const sql = 'select * from users where account = ?'
+    db.query(sql, login_info.account, (err, results) => {
+        if (err) return res.cc(err);
+        if (results.length !== 1) return res.cc('登录失败');
+
+        const compareResult = bcrypt.compareSync(loginfo.password, results[0].password)
+        if (!compareResult) {
+            return res.cc('登录失败')
+        }
+
+        res.send({
+            results: results[0],
+            status: 0,
+            message: '登录成功',
+            token: 'Bearer ' + tokenStr,
+        })
+    })
+}
