@@ -50,7 +50,7 @@ exports.login = (req, res) => {
         if (err) return res.cc(err);
         if (results.length !== 1) return res.cc('登录失败');
 
-        const compareResult = bcrypt.compareSync(loginfo.password, results[0].password)
+        const compareResult = bcrypt.compareSync(login_info.password, results[0].password)
         if (!compareResult) {
             return res.cc('登录失败')
         }
@@ -59,7 +59,7 @@ exports.login = (req, res) => {
             results: results[0],
             status: 0,
             message: '登录成功',
-            token: 'Bearer ' + tokenStr,
+            //token: 'Bearer ' + tokenStr,
         })
     })
 }

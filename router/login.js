@@ -10,6 +10,7 @@ const router = express.Router()
 const loginHandler = require('../router_handle/login.js')
 
 router.post('/register', loginHandler.register)
+router.post('/login', loginHandler.login)
 
 
 module.exports = router
