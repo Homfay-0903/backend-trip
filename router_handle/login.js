@@ -55,11 +55,21 @@ exports.login = (req, res) => {
             return res.cc('登录失败')
         }
 
+        const user = {
+            ...results[0],
+            password: '',
+            imageUrl: ''
+        }
+
+        const tokenStr = jwt.sign(user, jwtconfig.jwtSecretKey, {
+            expiresIn: '7h'
+        })
+
         res.send({
             results: results[0],
             status: 0,
             message: '登录成功',
-            //token: 'Bearer ' + tokenStr,
+            token: 'Bearer ' + tokenStr,
         })
     })
 }
