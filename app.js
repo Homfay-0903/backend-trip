@@ -27,6 +27,9 @@ app.use(bodyParser.json())
 const LoginRouter = require('./router/login')
 app.use('/api', LoginRouter)
 
+const UserInfoRouter = require('./router/userinfo')
+app.use('/user', UserInfoRouter)
+
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
