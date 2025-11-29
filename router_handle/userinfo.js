@@ -14,3 +14,16 @@ exports.getUserInfo = (req, res) => {
         })
     })
 }
+
+exports.changeName = (req, res) => {
+    const { id, name } = req.body
+    const sql = 'update users set name = ? where id = ?'
+    db.query(sql, [name, id], (err, results) => {
+        if (err) return res.cc(err);
+
+        res.send({
+            status: 0,
+            message: '修改昵称成功'
+        })
+    })
+}
