@@ -40,3 +40,16 @@ exports.changeSex = (req, res) => {
         })
     })
 }
+
+exports.changeEmail = (req, res) => {
+    const { id, emali } = req.body
+    const sql = 'update users set emali = ? where id = ?'
+    db.query(sql, [emali, id], (err, results) => {
+        if (err) return res.cc(err);
+
+        res.send({
+            status: 0,
+            message: '修改邮箱成功'
+        })
+    })
+}

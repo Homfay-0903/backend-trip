@@ -6,6 +6,7 @@ const UserInfoHandler = require('../router_handle/userinfo')
 router.post('/userinfo', UserInfoHandler.getUserInfo)
 router.post('/changeName', UserInfoHandler.changeName)
 router.post('/changeSex', UserInfoHandler.changeSex)
+router.post('/changeEmail', UserInfoHandler.changeEmail)
 
 
 module.exports = router
