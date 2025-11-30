@@ -42,9 +42,9 @@ exports.changeSex = (req, res) => {
 }
 
 exports.changeEmail = (req, res) => {
-    const { id, emali } = req.body
-    const sql = 'update users set emali = ? where id = ?'
-    db.query(sql, [emali, id], (err, results) => {
+    const { id, email } = req.body
+    const sql = 'update users set email = ? where id = ?'
+    db.query(sql, [email, id], (err, results) => {
         if (err) return res.cc(err);
 
         res.send({
