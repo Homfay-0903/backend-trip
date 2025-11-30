@@ -27,3 +27,16 @@ exports.changeName = (req, res) => {
         })
     })
 }
+
+exports.changeSex = (req, res) => {
+    const { id, sex } = req.body
+    const sql = 'update users set sex = ? where id = ?'
+    db.query(sql, [sex, id], (err, results) => {
+        if (err) return res.cc(err);
+
+        res.send({
+            status: 0,
+            message: '修改性别成功'
+        })
+    })
+}
