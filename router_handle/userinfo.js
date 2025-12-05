@@ -53,3 +53,18 @@ exports.changeEmail = (req, res) => {
         })
     })
 }
+
+exports.changePassword = (req, res) => {
+    const { id, password } = req
+    const sql = 'update users set password = ? where id = ?'
+    db.query(sql, [password, id], (err, results) => {
+        if (err) {
+            return res.cc(err)
+        }
+
+        res.send({
+            status: 0,
+            message: '修改密码成功'
+        })
+    })
+}

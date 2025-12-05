@@ -7,6 +7,7 @@ router.post('/userinfo', UserInfoHandler.getUserInfo)
 router.post('/changeName', UserInfoHandler.changeName)
 router.post('/changeSex', UserInfoHandler.changeSex)
 router.post('/changeEmail', UserInfoHandler.changeEmail)
+router.post('/changePassword', UserInfoHandler.changePassword)
 
 
 module.exports = router
