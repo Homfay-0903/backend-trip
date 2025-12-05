@@ -1,4 +1,5 @@
 const db = require('../db/index')
+const bcrypt = require('bcryptjs')
 
 exports.getUserInfo = (req, res) => {
     const { id } = req.body
@@ -55,9 +56,10 @@ exports.changeEmail = (req, res) => {
 }
 
 exports.changePassword = (req, res) => {
-    const { id, password } = req
+    const { id, password } = req.body
+    const newPassword = bcrypt.hashSync(password, 10)
     const sql = 'update users set password = ? where id = ?'
-    db.query(sql, [password, id], (err, results) => {
+    db.query(sql, [newPassword, id], (err, results) => {
         if (err) {
             return res.cc(err)
         }
