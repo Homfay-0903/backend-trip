@@ -15,11 +15,12 @@ app.use((req, res, next) => {
 const cors = require('cors')
 app.use(cors())
 
-const multer = require("multer");
+const multer = require("multer"); //1111
 const upload = multer({
     dest: './public/upload'
 })
 app.use(upload.any())
+app.use(express.static("./public"))
 
 const bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded
