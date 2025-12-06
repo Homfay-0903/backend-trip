@@ -91,3 +91,25 @@ exports.uploadAvatar = (req, res) => {
         })
     })
 }
+
+exports.bindAccount = (req, res) => {
+    const { account, onlyId, url } = req.body
+    const sql = 'update image set account = ? where onlyId = ?'
+    db.query(sql, [account, onlyId], (err, results) => {
+        if (err) {
+            return res.cc(err)
+        }
+        if (results.affectedRows == 1) {
+            const sql1 = 'update users set image_url = ? where account = ?'
+            db.query(sql1, [url, account], (err, results) => {
+                if (err) {
+                    return res.cc(err)
+                }
+                res.send({
+                    status: 0,
+                    message: '修改成功'
+                })
+            })
+        }
+    })
+}
