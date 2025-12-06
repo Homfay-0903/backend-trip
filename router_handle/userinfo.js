@@ -1,5 +1,7 @@
 const db = require('../db/index')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
+const fs = require('fs')
 
 exports.getUserInfo = (req, res) => {
     const { id } = req.body
@@ -67,6 +69,25 @@ exports.changePassword = (req, res) => {
         res.send({
             status: 0,
             message: '修改密码成功'
+        })
+    })
+}
+
+exports.uploadAvatar = (req, res) => {
+    const onlyId = crypto.randomUUID()
+    let oldName = req.files[0].filename;
+    let newName = Buffer.from(req.files[0].originalname, 'latin1').toString('utf8')
+    fs.renameSync('./public/upload/' + oldName, './public/upload/' + newName)
+    const sql = 'insert into image set ?'
+    db.query(sql, {
+        image_url: `http://127.0.0.1:3007/upload/${newName}`,
+        onlyId
+    }, (err, results) => {
+        if (err) return res.cc(err)
+        res.send({
+            onlyId,
+            status: 0,
+            url: 'http://127.0.0.1:3007/upload/' + newName
         })
     })
 }
