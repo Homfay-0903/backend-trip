@@ -9,6 +9,7 @@ router.post('/changeSex', UserInfoHandler.changeSex)
 router.post('/changeEmail', UserInfoHandler.changeEmail)
 router.post('/changePassword', UserInfoHandler.changePassword)
 router.post('/uploadAvatar', UserInfoHandler.uploadAvatar)
+router.post('/bindAccount', UserInfoHandler.bindAccount)
 
 
 module.exports = router
