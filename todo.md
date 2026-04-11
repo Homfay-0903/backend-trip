@@ -75,33 +75,33 @@
   - 参数：schedule_id + 可更新字段
 - [x] **DELETE /schedule/delete/:id** - 删除日程 ✅ 已完成
 
-#### 2.3 预算管理模块 (`/router/expense.js` + `/router_handle/expense.js`) 🚧 进行中
+#### 2.3 预算管理模块 (`/router/expense.js` + `/router_handle/expense.js`) ✅ 已完成
 
-- [ ] **POST /expense/create** - 记录支出
+- [x] **POST /expense/create** - 记录支出 ✅ 已完成
   - 参数：trip_id, category, amount, description, expense_date
-- [ ] **GET /expense/list/:trip_id** - 获取行程支出列表
+- [x] **GET /expense/list/:trip_id** - 获取行程支出列表 ✅ 已完成
   - 参数：trip_id, category(可选)
   - 返回：支出列表 + 分类统计
-- [ ] **GET /expense/statistics/:trip_id** - 支出统计
+- [x] **GET /expense/statistics/:trip_id** - 支出统计 ✅ 已完成
   - 参数：trip_id
   - 返回：总支出、分类占比、预算对比
-- [ ] **PUT /expense/update/:id** - 更新支出记录
-- [ ] **DELETE /expense/delete/:id** - 删除支出记录
+- [x] **PUT /expense/update/:id** - 更新支出记录 ✅ 已完成
+- [x] **DELETE /expense/delete/:id** - 删除支出记录 ✅ 已完成
 
-#### 2.4 游记模块 (`/router/travellog.js` + `/router_handle/travellog.js`)
+#### 2.4 游记模块 (`/router/travellog.js` + `/router_handle/travellog.js`) ✅ 已完成
 
-- [ ] **POST /travellog/create** - 发布游记
+- [x] **POST /travellog/create** - 发布游记 ✅ 已完成
   - 参数：user_id, trip_id(可选), title, content, images
-- [ ] **GET /travellog/list** - 获取游记列表
+- [x] **GET /travellog/list** - 获取游记列表 ✅ 已完成
   - 参数：page, page_size, user_id(可选), sort(最新/热门)
   - 返回：游记列表（分页）
-- [ ] **GET /travellog/detail/:id** - 获取游记详情
+- [x] **GET /travellog/detail/:id** - 获取游记详情 ✅ 已完成
   - 参数：travellog_id
   - 返回：游记详情 + 作者信息
-- [ ] **POST /travellog/like/:id** - 点赞游记
-- [ ] **DELETE /travellog/delete/:id** - 删除游记
+- [x] **POST /travellog/like/:id** - 点赞游记 ✅ 已完成
+- [x] **DELETE /travellog/delete/:id** - 删除游记 ✅ 已完成
 
-#### 2.5 提醒模块 (`/router/reminder.js` + `/router_handle/reminder.js`)
+#### 2.5 提醒模块 (`/router/reminder.js` + `/router_handle/reminder.js`) 🚧 进行中
 
 - [ ] **POST /reminder/create** - 创建提醒
   - 参数：user_id, trip_id, reminder_type, reminder_time, content
@@ -332,14 +332,14 @@
 ### 总体进度
 
 - 数据库设计：100% ✅
-- 后端API开发：40% 🚧
+- 后端API开发：60% 🚧
 - 前端功能实现：0%
 - 第三方集成：0%
 - 测试优化：0%
 
 ### 当前状态
 
-- 🚧 **正在开发**：预算管理模块
+- 🚧 **正在开发**：提醒模块
 - ✅ **已完成**：
   - 数据库表结构设计
   - 行程管理模块（6个接口全部完成）
@@ -354,9 +354,23 @@
     - GET /schedule/list/:trip_id 接口
     - PUT /schedule/update/:id 接口
     - DELETE /schedule/delete/:id 接口
+  - 预算管理模块（5个接口全部完成）
+    - POST /expense/create 接口
+    - GET /expense/list/:trip_id 接口
+    - GET /expense/statistics/:trip_id 接口
+    - PUT /expense/update/:id 接口
+    - DELETE /expense/delete/:id 接口
+  - 游记模块（5个接口全部完成）
+    - POST /travellog/create 接口
+    - GET /travellog/list 接口
+    - GET /travellog/detail/:id 接口
+    - POST /travellog/like/:id 接口
+    - DELETE /travellog/delete/:id 接口
   - 前端 API 文件
     - trip.js API文件
     - schedule.js API文件
+    - expense.js API文件
+    - travellog.js API文件
 
 ---
 

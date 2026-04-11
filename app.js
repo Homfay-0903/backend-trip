@@ -46,6 +46,9 @@ app.use('/schedule', ScheduleRouter)
 const ExpenseRouter = require('./router/expense')
 app.use('/expense', ExpenseRouter)
 
+const TravelLogRouter = require('./router/travellog')
+app.use('/travellog', TravelLogRouter)
+
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
