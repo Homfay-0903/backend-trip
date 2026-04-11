@@ -37,6 +37,15 @@ app.use('/api', LoginRouter)
 const UserInfoRouter = require('./router/userinfo')
 app.use('/user', UserInfoRouter)
 
+const TripRouter = require('./router/trip')
+app.use('/trip', TripRouter)
+
+const ScheduleRouter = require('./router/schedule')
+app.use('/schedule', ScheduleRouter)
+
+const ExpenseRouter = require('./router/expense')
+app.use('/expense', ExpenseRouter)
+
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
