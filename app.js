@@ -49,6 +49,12 @@ app.use('/expense', ExpenseRouter)
 const TravelLogRouter = require('./router/travellog')
 app.use('/travellog', TravelLogRouter)
 
+const ReminderRouter = require('./router/reminder')
+app.use('/reminder', ReminderRouter)
+
+const FavoriteRouter = require('./router/favorite')
+app.use('/favorite', FavoriteRouter)
+
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })
