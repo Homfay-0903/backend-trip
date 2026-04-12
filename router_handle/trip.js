@@ -1,6 +1,16 @@
 const db = require('../db/index.js')
 const crypto = require('crypto')
 
+function formatDateForMySQL(dateString) {
+    if (!dateString) return null
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return null
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
 exports.createTrip = (req, res) => {
     const tripInfo = req.body
 
@@ -28,8 +38,8 @@ exports.createTrip = (req, res) => {
         trip_name: tripInfo.trip_name,
         origin: tripInfo.origin || null,
         destination: tripInfo.destination,
-        start_date: tripInfo.start_date || null,
-        end_date: tripInfo.end_date || null,
+        start_date: formatDateForMySQL(tripInfo.start_date),
+        end_date: formatDateForMySQL(tripInfo.end_date),
         travelers: tripInfo.travelers || 1,
         budget: tripInfo.budget || null,
         transport: tripInfo.transport || null,
@@ -250,7 +260,11 @@ exports.updateTrip = (req, res) => {
 
         allowedFields.forEach(field => {
             if (updateData[field] !== undefined) {
-                updates[field] = updateData[field]
+                if (field === 'start_date' || field === 'end_date') {
+                    updates[field] = formatDateForMySQL(updateData[field])
+                } else {
+                    updates[field] = updateData[field]
+                }
             }
         })
 

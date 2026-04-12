@@ -1,5 +1,18 @@
 const db = require('../db/index.js')
 
+function formatDateTimeForMySQL(dateTimeString) {
+    if (!dateTimeString) return null
+    const date = new Date(dateTimeString)
+    if (isNaN(date.getTime())) return null
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
 exports.createReminder = (req, res) => {
     const reminderInfo = req.body
 
@@ -10,11 +23,11 @@ exports.createReminder = (req, res) => {
         })
     }
 
-    const validTypes = ['departure', 'weather', 'schedule', 'custom']
+    const validTypes = ['出发', '住宿', '景点', '餐饮', '交通', '其他', 'departure', 'weather', 'schedule', 'custom']
     if (!validTypes.includes(reminderInfo.reminder_type)) {
         return res.send({
             status: 1,
-            message: '提醒类型不合法，必须是：departure/weather/schedule/custom'
+            message: '提醒类型不合法'
         })
     }
 
@@ -47,9 +60,10 @@ function insertReminder(reminderInfo, res) {
     const reminderData = {
         user_id: reminderInfo.user_id,
         trip_id: reminderInfo.trip_id || null,
+        title: reminderInfo.title || null,
         reminder_type: reminderInfo.reminder_type,
-        reminder_time: reminderInfo.reminder_time,
-        content: reminderInfo.content || null,
+        reminder_time: formatDateTimeForMySQL(reminderInfo.reminder_time),
+        description: reminderInfo.description || null,
         is_sent: 0
     }
 
@@ -112,9 +126,10 @@ exports.getReminderList = (req, res) => {
             r.id,
             r.user_id,
             r.trip_id,
+            r.title,
             r.reminder_type,
             r.reminder_time,
-            r.content,
+            r.description,
             r.is_sent,
             r.created_at,
             t.trip_name,
@@ -168,7 +183,7 @@ exports.getReminderList = (req, res) => {
 
 exports.updateReminder = (req, res) => {
     const { id } = req.params
-    const { reminder_type, reminder_time, content, is_sent } = req.body
+    const { title, reminder_type, reminder_time, description, is_sent } = req.body
 
     if (!id) {
         return res.send({
@@ -196,12 +211,17 @@ exports.updateReminder = (req, res) => {
         const updateFields = []
         const updateValues = []
 
+        if (title !== undefined) {
+            updateFields.push('title = ?')
+            updateValues.push(title)
+        }
+
         if (reminder_type) {
-            const validTypes = ['departure', 'weather', 'schedule', 'custom']
+            const validTypes = ['出发', '住宿', '景点', '餐饮', '交通', '其他', 'departure', 'weather', 'schedule', 'custom']
             if (!validTypes.includes(reminder_type)) {
                 return res.send({
                     status: 1,
-                    message: '提醒类型不合法，必须是：departure/weather/schedule/custom'
+                    message: '提醒类型不合法'
                 })
             }
             updateFields.push('reminder_type = ?')
@@ -210,12 +230,12 @@ exports.updateReminder = (req, res) => {
 
         if (reminder_time) {
             updateFields.push('reminder_time = ?')
-            updateValues.push(reminder_time)
+            updateValues.push(formatDateTimeForMySQL(reminder_time))
         }
 
-        if (content !== undefined) {
-            updateFields.push('content = ?')
-            updateValues.push(content)
+        if (description !== undefined) {
+            updateFields.push('description = ?')
+            updateValues.push(description)
         }
 
         if (is_sent !== undefined) {
