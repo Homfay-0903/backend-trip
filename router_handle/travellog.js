@@ -41,7 +41,9 @@ function insertTravelLog(travelLogInfo, res) {
         trip_id: travelLogInfo.trip_id || null,
         title: travelLogInfo.title,
         content: travelLogInfo.content,
+        cover_image: travelLogInfo.cover_image || null,
         images: travelLogInfo.images ? JSON.stringify(travelLogInfo.images) : null,
+        tags: travelLogInfo.tags || null,
         is_public: travelLogInfo.is_public !== undefined ? travelLogInfo.is_public : 1
     }
 
@@ -93,14 +95,16 @@ exports.getTravelLogList = (req, res) => {
             tl.trip_id,
             tl.title,
             tl.content,
+            tl.cover_image,
             tl.images,
+            tl.tags,
             tl.views,
             tl.likes,
             tl.is_public,
             tl.created_at,
             tl.updated_at,
-            u.name as user_name,
-            u.image_url as user_avatar,
+            u.name as author_name,
+            u.image_url as author_avatar,
             t.trip_name,
             t.destination
         FROM travel_logs tl
@@ -156,6 +160,8 @@ exports.getTravelLogList = (req, res) => {
             const travelLogs = results.map(log => ({
                 ...log,
                 images: log.images ? JSON.parse(log.images) : [],
+                tags: log.tags ? JSON.parse(log.tags) : [],
+                likes_count: log.likes,
                 content_preview: log.content.substring(0, 100) + (log.content.length > 100 ? '...' : '')
             }))
 
@@ -176,6 +182,7 @@ exports.getTravelLogList = (req, res) => {
 
 exports.getTravelLogDetail = (req, res) => {
     const { id } = req.params
+    const { user_id } = req.query
 
     if (!id) {
         return res.send({
@@ -198,14 +205,16 @@ exports.getTravelLogDetail = (req, res) => {
             tl.trip_id,
             tl.title,
             tl.content,
+            tl.cover_image,
             tl.images,
+            tl.tags,
             tl.views,
             tl.likes,
             tl.is_public,
             tl.created_at,
             tl.updated_at,
-            u.name as user_name,
-            u.image_url as user_avatar,
+            u.name as author_name,
+            u.image_url as author_avatar,
             t.trip_name,
             t.destination,
             t.start_date,
@@ -233,39 +242,49 @@ exports.getTravelLogDetail = (req, res) => {
 
         const travelLog = {
             ...results[0],
-            images: results[0].images ? JSON.parse(results[0].images) : []
+            images: results[0].images ? JSON.parse(results[0].images) : [],
+            tags: results[0].tags ? JSON.parse(results[0].tags) : [],
+            likes_count: results[0].likes
         }
 
-        const commentSql = `
-            SELECT 
-                c.id,
-                c.user_id,
-                c.content,
-                c.parent_id,
-                c.likes,
-                c.created_at,
-                u.name as user_name,
-                u.image_url as user_avatar
-            FROM comments c
-            LEFT JOIN users u ON c.user_id = u.id
-            WHERE c.travel_log_id = ?
-            ORDER BY c.created_at DESC
-        `
-
-        db.query(commentSql, id, (err, commentResults) => {
+        const checkLikeSql = 'SELECT * FROM likes WHERE travel_log_id = ? AND user_id = ?'
+        db.query(checkLikeSql, [id, user_id], (err, likeResults) => {
             if (err) {
-                console.error('查询评论失败：', err.message)
+                console.error('查询点赞记录失败：', err.message)
             }
+            travelLog.is_liked = likeResults && likeResults.length > 0
 
-            travelLog.comments = commentResults || []
-            travelLog.comment_count = commentResults ? commentResults.length : 0
+            const commentSql = `
+                SELECT 
+                    c.id,
+                    c.user_id,
+                    c.content,
+                    c.parent_id,
+                    c.likes,
+                    c.created_at,
+                    u.name as user_name,
+                    u.image_url as user_avatar
+                FROM comments c
+                LEFT JOIN users u ON c.user_id = u.id
+                WHERE c.travel_log_id = ?
+                ORDER BY c.created_at DESC
+            `
 
-            res.send({
-                status: 0,
-                message: '获取游记详情成功',
-                data: {
-                    travel_log: travelLog
+            db.query(commentSql, id, (err, commentResults) => {
+                if (err) {
+                    console.error('查询评论失败：', err.message)
                 }
+
+                travelLog.comments = commentResults || []
+                travelLog.comment_count = commentResults ? commentResults.length : 0
+
+                res.send({
+                    status: 0,
+                    message: '获取游记详情成功',
+                    data: {
+                        travel_log: travelLog
+                    }
+                })
             })
         })
     })
@@ -308,53 +327,85 @@ exports.likeTravelLog = (req, res) => {
             }
 
             if (likeResults.length > 0) {
-                return res.send({
-                    status: 1,
-                    message: '您已经点赞过这篇游记了'
-                })
-            }
-
-            const insertLikeSql = 'INSERT INTO likes SET ?'
-            const likeData = {
-                travel_log_id: id,
-                user_id: user_id
-            }
-
-            db.query(insertLikeSql, likeData, (err, insertResults) => {
-                if (err) {
-                    return res.send({
-                        status: 1,
-                        message: '点赞失败：' + err.message
-                    })
-                }
-
-                const updateLikesSql = 'UPDATE travel_logs SET likes = likes + 1 WHERE id = ?'
-                db.query(updateLikesSql, id, (err) => {
-                    if (err) {
-                        console.error('更新点赞数失败：', err.message)
-                    }
-                })
-
-                const querySql = 'SELECT likes FROM travel_logs WHERE id = ?'
-                db.query(querySql, id, (err, likeCountResults) => {
+                const deleteLikeSql = 'DELETE FROM likes WHERE travel_log_id = ? AND user_id = ?'
+                db.query(deleteLikeSql, [id, user_id], (err, deleteResults) => {
                     if (err) {
                         return res.send({
                             status: 1,
-                            message: '查询点赞数失败'
+                            message: '取消点赞失败：' + err.message
                         })
                     }
 
-                    res.send({
-                        status: 0,
-                        message: '点赞成功',
-                        data: {
-                            travel_log_id: parseInt(id),
-                            likes: likeCountResults[0].likes,
-                            is_liked: true
+                    const updateLikesSql = 'UPDATE travel_logs SET likes = GREATEST(likes - 1, 0) WHERE id = ?'
+                    db.query(updateLikesSql, id, (err) => {
+                        if (err) {
+                            console.error('更新点赞数失败：', err.message)
                         }
                     })
+
+                    const querySql = 'SELECT likes FROM travel_logs WHERE id = ?'
+                    db.query(querySql, id, (err, likeCountResults) => {
+                        if (err) {
+                            return res.send({
+                                status: 1,
+                                message: '查询点赞数失败'
+                            })
+                        }
+
+                        res.send({
+                            status: 0,
+                            message: '取消点赞成功',
+                            data: {
+                                travel_log_id: parseInt(id),
+                                likes_count: likeCountResults[0].likes,
+                                is_liked: false
+                            }
+                        })
+                    })
                 })
-            })
+            } else {
+                const insertLikeSql = 'INSERT INTO likes SET ?'
+                const likeData = {
+                    travel_log_id: id,
+                    user_id: user_id
+                }
+
+                db.query(insertLikeSql, likeData, (err, insertResults) => {
+                    if (err) {
+                        return res.send({
+                            status: 1,
+                            message: '点赞失败：' + err.message
+                        })
+                    }
+
+                    const updateLikesSql = 'UPDATE travel_logs SET likes = likes + 1 WHERE id = ?'
+                    db.query(updateLikesSql, id, (err) => {
+                        if (err) {
+                            console.error('更新点赞数失败：', err.message)
+                        }
+                    })
+
+                    const querySql = 'SELECT likes FROM travel_logs WHERE id = ?'
+                    db.query(querySql, id, (err, likeCountResults) => {
+                        if (err) {
+                            return res.send({
+                                status: 1,
+                                message: '查询点赞数失败'
+                            })
+                        }
+
+                        res.send({
+                            status: 0,
+                            message: '点赞成功',
+                            data: {
+                                travel_log_id: parseInt(id),
+                                likes_count: likeCountResults[0].likes,
+                                is_liked: true
+                            }
+                        })
+                    })
+                })
+            }
         })
     })
 }
