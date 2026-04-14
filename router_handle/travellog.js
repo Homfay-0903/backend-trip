@@ -439,7 +439,7 @@ exports.deleteTravelLog = (req, res) => {
 
         const travelLog = results[0]
 
-        if (travelLog.user_id !== user_id) {
+        if (travelLog.user_id != user_id) {
             return res.send({
                 status: 1,
                 message: '无权删除此游记'

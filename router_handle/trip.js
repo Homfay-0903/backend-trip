@@ -43,6 +43,9 @@ exports.createTrip = (req, res) => {
         travelers: tripInfo.travelers || 1,
         budget: tripInfo.budget || null,
         transport: tripInfo.transport || null,
+        weather_data: tripInfo.weather_data ? JSON.stringify(tripInfo.weather_data) : null,
+        pois_data: tripInfo.pois_data ? JSON.stringify(tripInfo.pois_data) : null,
+        selected_pois: tripInfo.selected_pois ? JSON.stringify(tripInfo.selected_pois) : null,
         status: 'planning'
     }
 
@@ -255,13 +258,15 @@ exports.updateTrip = (req, res) => {
             })
         }
 
-        const allowedFields = ['trip_name', 'origin', 'destination', 'start_date', 'end_date', 'travelers', 'budget', 'transport', 'status']
+        const allowedFields = ['trip_name', 'origin', 'destination', 'start_date', 'end_date', 'travelers', 'budget', 'transport', 'status', 'weather_data', 'pois_data', 'selected_pois']
         const updates = {}
 
         allowedFields.forEach(field => {
             if (updateData[field] !== undefined) {
                 if (field === 'start_date' || field === 'end_date') {
                     updates[field] = formatDateForMySQL(updateData[field])
+                } else if (field === 'weather_data' || field === 'pois_data' || field === 'selected_pois') {
+                    updates[field] = updateData[field] ? JSON.stringify(updateData[field]) : null
                 } else {
                     updates[field] = updateData[field]
                 }

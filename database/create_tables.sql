@@ -79,7 +79,7 @@ CREATE TABLE `travel_logs` (
   `trip_id` int(11) DEFAULT NULL COMMENT '关联行程ID（可选）',
   `title` varchar(255) NOT NULL COMMENT '游记标题',
   `content` longtext COMMENT '游记内容',
-  `cover_image` varchar(500) DEFAULT NULL COMMENT '封面图片URL',
+  `cover_image` longtext COMMENT '封面图片URL',
   `images` longtext COMMENT '图片URL列表（JSON格式）',
   `tags` text COMMENT '标签列表（JSON格式）',
   `views` int(11) DEFAULT 0 COMMENT '浏览量',
